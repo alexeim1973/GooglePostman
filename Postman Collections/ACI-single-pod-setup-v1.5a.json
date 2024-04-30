@@ -1,0 +1,308 @@
+{
+	"info": {
+		"_postman_id": "10a2c03b-2380-4aed-937f-a4b9b2331bed",
+		"name": "ACI - Single Pod Setup v1.5a",
+		"description": "PLEASE CLONE THIS COLLECTIN BEFORE MODIFYING IT!\n\n1.5a folder rearrangement  \n1.4 fixed backup script  \n1.3 added backup script  \n1.2 fixed RR config (now all 4 spines are RRs)  \n1.0 first release\n\nMultipod topology includes:\n\n- 2 spines and 4 leaves with serial numbers for Pod 1.\n- 2 spines and 4 leaves with serial numbers for Pod 2.\n- 2 IPN nodes for each pod\n- full mesh between spins and IPN for each pod\n- 4 IPN nodes can implement any type of meshed topology, considering high-availablilty\n- ring IPN topology has been validated\n    \n\nMulti-Pod Setup Postman Collection, comes \"as is\" from Cisco Sweden.\n\nREQUIRES SIGNIFICUNT MODIFICATIN BEFORE BEING USED.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Pod discovery and policies",
+			"item": [
+				{
+					"name": "1_LOGIN_XML",
+					"id": "0df30d1a-de4e-4694-b2a1-931a8e3c06ce",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "<aaaUser name='{{USERNAME}}' pwd='{{PASSWORD}}'/>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": "https://{{APIC1}}/api/aaaLogin.xml",
+						"description": "LOGIN"
+					},
+					"response": []
+				},
+				{
+					"name": "2.1_REGISTER_NODES_POD_1",
+					"id": "f8f8c473-8ba2-4b1e-b96c-19228fbd0b2b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<fabricNodeIdentPol>\r\n    <fabricNodeIdentP serial=\"FDO2643036N\" name=\"SP911\" nodeId=\"911\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO2643034H\" name=\"SP912\" nodeId=\"912\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO270405SP\" name=\"LF101\" nodeId=\"101\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO270405PV\" name=\"LF102\" nodeId=\"102\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO270405T2\" name=\"LF103\" nodeId=\"103\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO270405UQ\" name=\"LF104\" nodeId=\"104\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO2735147E\" name=\"LF105\" nodeId=\"105\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO27350XKG\" name=\"LF106\" nodeId=\"106\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO2735144N\" name=\"LF107\" nodeId=\"107\" podId=\"1\"/>\r\n    <fabricNodeIdentP serial=\"FDO2733514GF\" name=\"LF108\" nodeId=\"108\" podId=\"1\"/>\r\n</fabricNodeIdentPol>"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni/controller.xml",
+						"description": "RegisterNode"
+					},
+					"response": []
+				},
+				{
+					"name": "3.1_NODE_OOB_MGMT_IP_POD_1",
+					"id": "57d7d19d-868a-4926-a994-8cd5e96e6be8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<fvTenant descr=\"\" dn=\"uni/tn-mgmt\" name=\"mgmt\">\r\n    <mgmtMgmtP descr=\"\" name=\"default\">\r\n    <mgmtOoB descr=\"\" name=\"default\">\r\n      <mgmtRsOoBStNode addr=\"172.31.255.101/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-101\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.102/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-102\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.103/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-103\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.104/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-104\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.105/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-105\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.106/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-106\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.107/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-107\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.108/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-108\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.91/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-911\"/>\r\n      <mgmtRsOoBStNode addr=\"172.31.255.92/24\" gw=\"172.31.255.1\" tDn=\"topology/pod-1/node-912\"/>\r\n    </mgmtOoB>\r\n  </mgmtMgmtP>\r\n</fvTenant>",
+							"options": {
+								"raw": {
+									"language": "xml"
+								}
+							}
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni.xml",
+						"description": "NodeMgmtIP"
+					},
+					"response": []
+				},
+				{
+					"name": "3.1_NODE_INBAND_MGMT_IP_POD_1",
+					"id": "ace031a1-f18c-4e29-8329-f2607b632b2e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<fvTenant dn=\"uni/tn-mgmt\" name=\"mgmt\">\r\n    <mgmtMgmtP name=\"default\">\r\n      <mgmtInB name=\"EPG-INBAND-MGMT\">\r\n        <mgmtRsInBStNode addr=\"10.60.0.11/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-1\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.12/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-2\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.13/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-3\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.101/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-101\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.102/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-102\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.103/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-103\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.104/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-104\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.91/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-911\"/>\r\n        <mgmtRsInBStNode addr=\"10.60.0.92/24\" gw=\"10.60.0.1\" tDn=\"topology/pod-1/node-912\"/>\r\n    </mgmtInB>\r\n  </mgmtMgmtP>\r\n</fvTenant>\r\n"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni.xml",
+						"description": "NodeMgmtIP"
+					},
+					"response": []
+				},
+				{
+					"name": "4_POD_POLICIES",
+					"id": "434722a3-c34d-43aa-b53c-5d515ac86923",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<fabricInst>\r\n<!-- Pod Policies  -->\r\n    <!-- Timezone  -->\r\n    <datetimeFormat dn=\"uni/fabric/format-default\" tz=\"p120_Europe-Stockholm\"/>\r\n  <!-- NTP Server -->\r\n  <datetimePol dn=\"uni/fabric/time-PPO-NTP\">\r\n    <datetimeNtpProv name=\"172.31.255.1\" descr=\"NTP Server 1\" preferred=\"true\">\r\n        <datetimeRsNtpProvToEpg tDn=\"uni/tn-mgmt/mgmtp-default/oob-default\"/>\r\n    </datetimeNtpProv>\r\n  </datetimePol>\r\n  \r\n  <!-- BGP Route Reflector -->\r\n  <bgpInstPol name='default'>\r\n      <!--  BGP AS Number  -->\r\n        <bgpAsP name='aspn' asn='65432'/>\r\n         <!--  External RR Nodes  -->\r\n            <bgpRRP name='route-reflector'>\r\n                <bgpRRNodePEp id='911'/>\r\n                <bgpRRNodePEp id='912'/>\r\n             </bgpRRP>\r\n    </bgpInstPol>\r\n    \r\n<!-- Policy Group -->    \r\n  <fabricFuncP>\r\n    <fabricPodPGrp name=\"PPG-SINGLEPOD\">\r\n      <fabricRsTimePol tnDatetimePolName=\"PPO-NTP\"/>\r\n      <fabricRsSnmpPol tnSnmpPolName=\"default\"/>\r\n      <fabricRsPodPGrpBGPRRP tnBgpInstPolName=\"default\"/>\r\n      <fabricRsPodPGrpIsisDomP tnIsisDomPolName=\"default\"/>\r\n      <fabricRsPodPGrpCoopP tnCoopPolName=\"default\"/>\r\n      <fabricRsCommPol tnCommPolName=\"default\"/>\r\n    </fabricPodPGrp>\r\n  </fabricFuncP>\r\n\r\n<!-- Apply Pod Profile --> \r\n  <fabricPodP name=\"default\">\r\n    <fabricPodS name=\"default\" type=\"ALL\">\r\n      <fabricRsPodPGrp tDn=\"uni/fabric/funcprof/podpgrp-PPG-SINGLEPOD\"/>\r\n    </fabricPodS>\r\n  </fabricPodP>\r\n</fabricInst>\r\n"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni.xml",
+						"description": "L3 Infra"
+					},
+					"response": []
+				}
+			],
+			"id": "8293a883-c069-4054-86eb-f621e817b0f3"
+		},
+		{
+			"name": "De-commision leaves and spines",
+			"item": [
+				{
+					"name": "1_LOGIN_XML",
+					"id": "5dd4c1a6-6fa1-4b35-9705-12684ed3a412",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<aaaUser name='{{USERNAME}}' pwd='{{PASSWORD}}'/>"
+						},
+						"url": "https://{{APIC1}}/api/aaaLogin.xml",
+						"description": "LOGIN"
+					},
+					"response": []
+				},
+				{
+					"name": "DECOMMISSION_ALL_NODES_POD_1",
+					"id": "ac8047eb-0c71-4ac9-89ea-35630279e101",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<fabricOOServicePol>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-101\" status=\"created,modified\" removeFromController=\"true\"/>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-102\" status=\"created,modified\" removeFromController=\"true\"/>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-103\" status=\"created,modified\" removeFromController=\"true\"/>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-104\" status=\"created,modified\" removeFromController=\"true\"/>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-911\" status=\"created,modified\" removeFromController=\"true\"/>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-912\" status=\"created,modified\" removeFromController=\"true\"/>\r\n</fabricOOServicePol>"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni/fabric/outofsvc.xml",
+						"description": "RegisterNode"
+					},
+					"response": []
+				},
+				{
+					"name": "DECOMMISSION_SINGLE_NODE",
+					"id": "1b567a8c-d36b-43fb-8f5c-3f400e066a45",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<!-- Feasible node IDs \r\n    101,102,103,104,911,912\r\n-->\r\n<fabricOOServicePol>\r\n    <fabricRsDecommissionNode tDn=\"topology/pod-1/node-101\" status=\"created,modified\" removeFromController=\"true\"/>\r\n</fabricOOServicePol>"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/uni/fabric/outofsvc.xml",
+						"description": "RegisterNode"
+					},
+					"response": []
+				}
+			],
+			"id": "76a41df0-68a9-4d45-8bfb-a8a983ee127b"
+		},
+		{
+			"name": "Housekeeping",
+			"item": [
+				{
+					"name": "1_LOGIN_XML",
+					"id": "d31f9619-62c0-4af4-b898-3f0479393b3b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<aaaUser name='{{USERNAME}}' pwd='{{PASSWORD}}'/>"
+						},
+						"url": "https://{{APIC1}}/api/mo/aaaLogin.xml",
+						"description": "LOGIN"
+					},
+					"response": []
+				},
+				{
+					"name": "Configure_EncryptionKeys",
+					"id": "f7147d19-d9ef-4fd5-8de9-f7dcff12e972",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<polUni>\n  <pkiExportEncryptionKey strongEncryptionEnabled=\"yes\" passphrase=\"C1sco123C1sco123\" />\n</polUni>"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/.xml",
+						"description": "Confiugre Encryption Keys"
+					},
+					"response": []
+				},
+				{
+					"name": "Configure_Backups - TEMPLATE ONLY!!",
+					"id": "6fc99808-4941-4400-8c50-3248851b775a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<polUni>\n    <fabricInst>\n   \n    <fileRemotePath host=\"10.52.230.63\" name=\"CPOC-Z_Backups\" protocol=\"ftp\" remotePath=\"/FTP-TFTP/APIC-Backups/i08-fabric-01/\" remotePort=\"21\" userName=\"anonymous\" userPasswd=\"mypass@me.com\" descr=\"in Z drive in FTP-TFTP/APIC-Backups/i08-fabric-01/folder\">\n        <fileRsARemoteHostToEpg tDn=\"uni/tn-mgmt/mgmtp-default/oob-default\">\n        </fileRsARemoteHostToEpg>\n    </fileRemotePath>\n    \n    <trigSchedP name=\"Daliy-CPOC\">\n        <trigRecurrWindowP name=\"Daily\" hour=\"2\"></trigRecurrWindowP>\n    </trigSchedP>\n    \n    <configExportP name=\"DailyToExteral\" descr=\"save backups on Z drive\" adminSt=\"triggered\">\n        \n        <configRsExportScheduler tnTrigSchedPName=\"Daliy-CPOC\">\n        </configRsExportScheduler>\n        \n        <configRsRemotePath tnFileRemotePathName=\"CPOC-Z_Backups\">\n        </configRsRemotePath>\n        \n    </configExportP>\n    \n    </fabricInst>\n</polUni>"
+						},
+						"url": "https://{{APIC1}}/api/node/mo/.xml",
+						"description": "Daily backup of fabric to Z drive FTP-TFTP/APIC-backups/i02-fabric-01"
+					},
+					"response": []
+				}
+			],
+			"id": "6a694052-f1d9-4508-8903-ff91e05ee176"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				],
+				"id": "2338b1e3-63e6-4469-80d0-2fc679b278ab"
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				],
+				"id": "05e40755-b189-43fb-95c6-835c39547b34"
+			}
+		}
+	]
+}
